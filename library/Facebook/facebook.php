@@ -34,7 +34,9 @@ class Facebook_Facebook extends BaseFacebook
    */
   public function __construct($config) {
     if (!session_id()) {
-      session_start();
+      //session_start();
+      //need this for Zend Framework
+      Zend_Session::start();
     }
     parent::__construct($config);
   }

@@ -10,16 +10,14 @@ class Josh_Facebook
 		if(self::$fb)
 		{
 			return self::$fb;
+			print_r(self::$fb);
 		}
+
+		$options = Zend_Registry::get('config')->facebook;
 		
-		$bootstrap = Zend_Controller_Front::getInstance()->getParam('bootstrap');
-		
-		$options = $bootstrap->getOptions();
-		
-		
-		$fb = New Facebook_Facebook(array(
-				'appId' => $options['facebook']['appid'],
-				'secret' => $options['facebook']['appsecret'],
+		$fb = new Facebook_Facebook(array(
+				  'appId'  => $options->appid,
+				  'secret' => $options->secret,
 				));
 		
 		self::$fb = $fb;
@@ -33,5 +31,16 @@ class Josh_Facebook
         $callback = array ( self::getFB(), $name ) ;
         return call_user_func_array ( $callback , $args ) ;
     }
+	
+	public static function killSession ()
+	{
+		$options = Zend_Registry::get('config')->facebook;
+		$fbAppid = 'fb_' . $options->appid;
+		
+		setcookie('fbs_'.$options->appid, '', time()-100, '/', 'domain.com');
+		unset($_SESSION[$fbAppid . '_user_id']);
+		unset($_SESSION[$fbAppid . '_code']);
+		unset($_SESSION[$fbAppid . '_access_token']);
+	}
 }
 ?>

@@ -10,9 +10,14 @@ class IndexController extends Zend_Controller_Action
 
     public function indexAction()
     {
-        // action body
+    	//see if we have any access to fb
+		
+		if(Zend_Auth::getInstance()->hasIdentity())
+		{
+			$this->view->identity = Zend_Auth::getInstance()->getIdentity();
+			$this->view->userObj = $this->view->identity['user'];
+		}
     }
-
 
 }
 

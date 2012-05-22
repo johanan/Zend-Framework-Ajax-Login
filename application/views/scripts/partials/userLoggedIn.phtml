@@ -1,0 +1,13 @@
+<div id="userLoggedIn" class="btn-group">
+<button class="btn"><?php echo $this->userObj->getFirstName(); ?></button>
+<button class="btn dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+<ul class="dropdown-menu span4">
+	<li><a href="<?php echo $this->baseUrl('/user/profile'); ?>" >
+			<div class="menu-profile">
+			<img src="<?php echo $this->userObj->getIMGURL(50); ?>"/> <?php echo $this->userObj->getFullName(); ?> - (View my profile)
+			</div>
+		</a>
+	</li>
+	<li><a href="<?php echo $this->baseUrl('/login/logout'); ?>">Logout</a></li>
+</ul>
+</div>

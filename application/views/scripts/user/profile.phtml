@@ -1,0 +1,32 @@
+<div class="row">
+	<div class="span2">
+		<img src="<?php echo $this->user->getIMGURL(200); ?>" />
+	</div>
+	<div class="span10">
+		<h1><?php echo $this->user->getFullName(); ?></h1>
+		<?php echo $this->user->getFirstName(); ?> is logged in. If I had a database connection I could show other info here.
+	</div>
+</div>
+<hr/>
+<div class="row">
+	<div class="span3">
+		Zend Auth Identity Object dump:
+	</div>
+	<div class="span9">
+		<pre>
+			<?php print_r(Zend_Auth::getInstance()->getIdentity()); 
+			print_r(get_class_methods('Zend_Auth')); ?>
+		</pre>
+	</div>
+</div>
+<div class="row">
+	<div class="span3">
+		Auth User Object dump:
+	</div>
+	<div class="span9">
+		<pre>
+			<?php print_r($this->user); 
+			print_r(get_class_methods($this->user)); ?>
+		</pre>
+	</div>
+</div>
