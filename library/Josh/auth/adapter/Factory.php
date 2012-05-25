@@ -11,6 +11,6 @@ class Josh_Auth_Adapter_Factory
 		elseif($type == 'userpass')
 			return new Josh_Auth_Adapter_Db($options['email']);
 		else 
-			return false;
+			return new Josh_Auth_Adapter_None();
 	}
 }

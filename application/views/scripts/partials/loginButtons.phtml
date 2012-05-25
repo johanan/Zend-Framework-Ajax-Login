@@ -1,12 +1,12 @@
 <div id="loginButtons">
 	<!--<div class="fb-login-button" data-size="medium" data-scope="email" data-width="200" data-max-rows="1" data-auth-type="fb">Connect with Facebook</div>-->
-	<button class="btn fb-button" data-auth-type="fb" ><i class="icon-fb"></i>Facebook(ajax)</button>
-	<button class="btn fb-button" data-auth-type="fb-oauth" data-endpoint="<?php echo Josh_Facebook::getLoginUrl(array('redirect_uri' => Zend_Registry::get('config')->facebook->redirectUrl, 'scope' => 'email')); ?>"><i class="icon-fb"></i>Facebook(oauth)</button>
-	<button class="btn btn-info" data-auth-type="twitter" data-endpoint="<?php echo Zend_Registry::get('config')->twitter->redirectUrl; ?>"><i class="icon-twitter"></i>Twitter(oauth)</button>
-	<button class="btn" data-auth-type="none">No Type (will error)</button>
-	<form class="form-inline">
-		<input type="text" class="input-small" placeholder="Email">
-		<input type="password" class="input-small" placeholder="Password">
-		<button type="submit" class="btn" data-auth-type="userpass">Go</button>
+	<button class="btn fb-button login-btn" data-auth-type="fb" data-endpoint="<?php echo Zend_Registry::get('config')->facebook->endpoint; ?>"><i class="icon-fb"></i>Facebook(ajax)</button>
+	<button class="btn fb-button login-btn" data-auth-type="fb-oauth" data-endpoint="<?php echo Josh_Facebook::getLoginUrl(array('redirect_uri' => Zend_Registry::get('config')->facebook->redirectUrl, 'scope' => 'email')); ?>"><i class="icon-fb"></i>Facebook(oauth)</button>
+	<button class="btn btn-info login-btn" data-auth-type="twitter" data-endpoint="<?php echo Zend_Registry::get('config')->twitter->redirectUrl; ?>"><i class="icon-twitter"></i>Twitter(oauth)</button>
+	<button class="btn login-btn" data-auth-type="none" data-ajax="true" data-endpoint="/demos/zf-ajax/ajax">No Type (will error)</button>
+	<form class="form-inline" id="userpass">
+		<input type="text" class="input-small" name="email" placeholder="Email">
+		<input type="password" class="input-small" name="password" placeholder="Password">
+		<button type="submit" class="btn login-btn" name="submit" data-auth-type="userpass" data-ajax="true" data-endpoint="<?php echo Zend_Registry::get('config')->userpass->endpoint; ?>">Go</button>
 	</form>
 </div>

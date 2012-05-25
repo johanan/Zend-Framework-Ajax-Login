@@ -16,7 +16,8 @@ class Josh_Auth_Adapter_Db implements Zend_Auth_Adapter_Interface
 		{
 			return new Zend_Auth_Result( Zend_Auth_Result::FAILURE_IDENTITY_AMBIGUOUS, $this->_email, array('error'=>'No email supplied'));
 		}else{
-			return new Zend_Auth_Result( Zend_Auth_Result::SUCCESS, $this->_email);
+			return new Zend_Auth_Result( Zend_Auth_Result::SUCCESS, $this->_email, array('first_name'=>$this->_email, 
+						'last_name'=>'None', 'id'=>null, 'email' => $this->_email, 'gender' => null));
 		}
     }
 }

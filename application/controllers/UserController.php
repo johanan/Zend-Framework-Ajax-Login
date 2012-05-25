@@ -19,6 +19,15 @@ class UserController extends Zend_Controller_Action
 			$this->_redirect('/');
 		}
     }
+	
+	public function logoutAction()
+	{
+		$this->_helper->flashMessenger->addMessage(array('success'=>'Logout was successful'));
+		$auth = Zend_Auth::getInstance();
+        $auth->clearIdentity();
+		Josh_Facebook::killSession();
+		$this->_redirect('/');
+	}
 
 
 }
