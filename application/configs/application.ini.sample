@@ -26,8 +26,16 @@ twitter.consumerSecret = APP_SECRET
 twitter.redirectUrl = "http://YOUR_SERVER/oauth/twitter/popup"
 twitter.method = "data-popup"
 
+google.endpoint = "/oauth/google/popup"
+google.method = "data-popup"
+
 userpass.endpoint = "/ajax/userpass"
 userpass.method = "data-ajax"
+
+;attributes to fetch
+openid.tofetch.firstName = true
+openid.tofetch.email = true
+openid.tofetch.lastName = true
 
 [staging : production]
 

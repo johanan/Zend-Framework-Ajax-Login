@@ -16,9 +16,9 @@
  * @category   Zend
  * @package    Zend_OpenId
  * @subpackage Zend_OpenId_Consumer
- * @copyright  Copyright (c) 2005-2011 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: Consumer.php 23775 2011-03-01 17:25:24Z ralph $
+ * @version    $Id: Consumer.php 20096 2010-01-06 02:05:09Z bkarwin $
  */
 
 /**
@@ -47,7 +47,7 @@ require_once 'Zend/Http/Client.php';
  * @category   Zend
  * @package    Zend_OpenId
  * @subpackage Zend_OpenId_Consumer
- * @copyright  Copyright (c) 2005-2011 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 class Zend_OpenId_Consumer
@@ -465,59 +465,6 @@ class Zend_OpenId_Consumer
     }
 
     /**
-     * Performs HTTP request to given $url using given HTTP $method.
-     * Send additinal query specified by variable/value array,
-     * On success returns HTTP response without headers, false on failure.
-     *
-     * @param string $url OpenID server url
-     * @param string $method HTTP request method 'GET' or 'POST'
-     * @param array $params additional qwery parameters to be passed with
-     * @param int &$staus HTTP status code
-     *  request
-     * @return mixed
-     */
-    protected function _httpRequest($url, $method = 'GET', array $params = array(), &$status = null)
-    {
-        $client = $this->_httpClient;
-        if ($client === null) {
-            $client = new Zend_Http_Client(
-                    $url,
-                    array(
-                        'maxredirects' => 4,
-                        'timeout'      => 15,
-                        'useragent'    => 'Zend_OpenId'
-                    )
-                );
-        } else {
-            $client->setUri($url);
-        }
-
-        $client->resetParameters();
-        if ($method == 'POST') {
-            $client->setMethod(Zend_Http_Client::POST);
-            $client->setParameterPost($params);
-        } else {
-            $client->setMethod(Zend_Http_Client::GET);
-            $client->setParameterGet($params);
-        }
-
-        try {
-            $response = $client->request();
-        } catch (Exception $e) {
-            $this->_setError('HTTP Request failed: ' . $e->getMessage());
-            return false;
-        }
-        $status = $response->getStatus();
-        $body = $response->getBody();
-        if ($status == 200 || ($status == 400 && !empty($body))) {
-            return $body;
-        }else{
-            $this->_setError('Bad HTTP response');
-            return false;
-        }
-    }
-
-    /**
      * Create (or reuse existing) association between OpenID consumer and
      * OpenID server based on Diffie-Hellman key agreement. Returns true
      * on success and false on failure.
@@ -707,31 +654,73 @@ class Zend_OpenId_Consumer
     }
 
     /**
-     * Performs discovery of identity and finds OpenID URL, OpenID server URL
-     * and OpenID protocol version. Returns true on succees and false on
-     * failure.
+     * Performs HTTP request to given $url using given HTTP $method.
+     * Send additinal query specified by variable/value array,
+     * On success returns HTTP response without headers, false on failure.
+     *
+     * @param string $url OpenID server url
+     * @param string $method HTTP request method 'GET' or 'POST'
+     * @param array $params additional qwery parameters to be passed with
+     * @param int &$staus HTTP status code
+     *  request
+     * @param bool $includeHeader Whether or not to include the header in the response
+     * @return mixed
+     */
+    protected function _httpRequest($url, $method = 'GET', array $params = array(), &$status = null, $includeHeader = false) {
+        $client = $this->_httpClient;
+        if ($client === null) {
+            $client = new Zend_Http_Client(
+                    $url,
+                    array(
+                        'maxredirects' => 4,
+                        'timeout'      => 15,
+                        'useragent'    => 'Zend_OpenId'
+                    )
+                );
+        } else {
+            $client->setUri($url);
+        }
+
+        $client->resetParameters();
+        if ($method == 'POST') {
+            $client->setMethod(Zend_Http_Client::POST);
+            $client->setParameterPost($params);
+        } else {
+            $client->setMethod(Zend_Http_Client::GET);
+            $client->setParameterGet($params);
+        }
+
+        try {
+            $response = $client->request();
+        } catch (Exception $e) {
+            $this->_setError('HTTP Request failed: ' . $e->getMessage());
+            return false;
+        }
+        $status = $response->getStatus();
+        if ($includeHeader) {
+            $body = $response->asString("\n");
+        }else{
+            $body = $response->getBody();
+        }
+        if ($status == 200 || ($status == 400 && !empty($body))) {
+            return $body;
+        }else{
+            $this->_setError('Bad HTTP response');
+            return false;
+        }
+    }
+
+    /**
+     * Performs HTML discovery
      *
      * @param string &$id OpenID identity URL
      * @param string &$server OpenID server URL
      * @param float &$version OpenID protocol version
      * @return bool
-     * @todo OpenID 2.0 (7.3) XRI and Yadis discovery
      */
-    protected function _discovery(&$id, &$server, &$version)
+    protected function _discoveryHtml(&$id, &$server, &$version)
     {
         $realId = $id;
-        if ($this->_storage->getDiscoveryInfo(
-                $id,
-                $realId,
-                $server,
-                $version,
-                $expire)) {
-            $id = $realId;
-            return true;
-        }
-
-        /* TODO: OpenID 2.0 (7.3) XRI and Yadis discovery */
-
         /* HTML-based discovery */
         $response = $this->_httpRequest($id, 'GET', array(), $status);
         if ($status != 200 || !is_string($response)) {
@@ -797,6 +786,191 @@ class Zend_OpenId_Consumer
     }
 
     /**
+     * Starts the discovery process
+		 *
+		 * This method actually finds out which discovery method (XRI, Yadis of HTML)
+		 * should be used and delegates the actual discovery to the corresponding
+		 * _discovery* method
+     *
+     * @param string &$id OpenID identity URL
+     * @param string &$server OpenID server URL
+     * @param float &$version OpenID protocol version
+     * @return bool
+     */
+    protected function _discovery(&$id, &$server, &$version) {
+      $realId = $id;
+      if ($this->_storage->getDiscoveryInfo(
+                $id,
+                $realId,
+                $server,
+                $version,
+                $expire)) {
+            $id = $realId;
+            return true;
+        }
+
+        $xriChars = array('=', '@', '+', '$', '!', '(');
+        if (in_array(substr($id, 0, 1), $xriChars)) { //It is an XRI
+            $xrds = $this->_httpRequest("https://xri.net/" . $id, "GET", array('query'=>'', '_xrd_r'=>'application/xrds+xml'), $status);
+            if ($status != 200 || !is_string($response)) {
+                return false;
+            }
+            $return = $this->_discoveryXrds($xrds, $realId, $server, $version);
+            $version = 2.0;
+        }elseif (!($return = $this->_discoveryYadis($id, $realId, $server, $version))) { //If Yadis discovery fails, then HTML discovery should be tried
+            $return = $this->_discoveryHtml($id, $server, $version);
+        }
+				if ($return) {
+				    $expire = time() + 60 * 60;
+				    $this->_storage->addDiscoveryInfo($id, $realId, $server, $version, $expire);
+            $id = $realId;
+				    return true;
+				}else{
+				    return false;
+				}
+    }
+
+    /**
+     * Performs discovery on an XRDS document
+     *
+		 * @param string $xrds The XRDS document in string format
+     * @param string &$realId OpenID identity URL
+     * @param string &$server OpenID server URL
+     * @param float &$version OpenID protocol version
+     * @return bool
+     */
+    protected function _discoveryXrds($xrds, &$realId, &$server, &$version) {
+        $serverServices = array();
+        $signonServices = array();
+        $xml = new SimpleXMLElement($xrds);
+        for ($XRDCounter = count($xml->XRD) - 1; $XRDCounter >= 0; $XRDCounter--) { //Last XRD gives most specific information!
+            if ((count($serverServices) > 0) || (count($signonServices) > 0)) { //If we found what we're looking for in a previous XRD, then we're done!
+                break;
+            }
+            $XRD = $xml->XRD[$XRDCounter];
+            foreach ($XRD->Service as $service) { //Cycle through the different services described in this XRDS document
+                if (!isset($service->URI)) {
+                    continue;
+                }
+                if (!isset($service['priority']) || (strval(intval($service['priority'])) != $service['priority'])) {
+                    $priority = 99999;
+                }else{
+                    $priority = intval($service['priority']);
+                }
+                foreach ($service->Type as $type) { //Look if this service has the right type (eg an OpenId descriptor) and if so, store the information appropriately
+                    if ("http://specs.openid.net/auth/2.0/server" == $type[0]) {
+                        if (!isset($serverServices[$priority])) {
+                            $serverServices[$priority] = array();
+                        }
+                        $uris = array();
+                        foreach ($service->URI as $uri) {
+                            $uris[] = strval($uri);
+                        }
+                        $serverServices[$priority][] = array("protocol"=>"http://specs.openid.net/auth/2.0/server", "endpoints"=>$uris, "claimedID"=>"http://specs.openid.net/auth/2.0/identifier_select", "localID"=>"http://specs.openid.net/auth/2.0/identifier_select");
+												$version = 2.0;
+                        continue 2;
+                    }elseif (("http://specs.openid.net/auth/2.0/signon" == $type[0]) ||
+														 (($version != 2.0) && ("http://openid.net/signon/1.1" == $type[0]))) {
+                        if (!isset($signonServices[$priority])) {
+                            $signonServices[$priority] = array();
+                        }
+                        $uris = array();
+                        foreach ($service->URI as $uri) {
+                            $uris[] = strval($uri);
+                        }
+                        if (isset($XRD->CanonicalID[0])) {
+                            $id = strval($XRD->CanonicalID[0]);
+                        }else{
+                            $id=$realId;
+                        }
+                        $signonServices[$priority][] = array("protocol"=>$type[0], "endpoints"=>$uris, "claimedID"=>$id, "localID"=>(isset($XRD->localID[0]) ? strval($XRD->localID[0]) : $id));
+												if ("http://openid.net/signon/1.1" == $type[0]){
+                            $version = 1.1;
+												}else{
+												    $version = 2.0;
+												}
+                    }
+                }
+            }
+        }
+				//Sort all correct services, based on their priority; 'server' logon is more important than 'signon'
+        $services = array();
+        if (count($serverServices) > 0) {
+            ksort($serverServices);
+            foreach($serverServices as $samePriority) {
+                shuffle($samePriority);
+                foreach ($samePriority as $service) {
+                    $services[] = $service;
+                }
+            }
+        }
+        if (count($signonServices) > 0) {
+            ksort($signonServices);
+            foreach($signonServices as $samePriority) {
+                shuffle($samePriority);
+                foreach ($samePriority as $service) {
+                    $services[] = $service;
+                }
+            }
+        }
+        if (count($services) < 1) {
+            throw new Exception("No endpoint found!" . $xrds);
+        }
+
+				//Take a random endpoint from the service with the highest priority
+        shuffle($services[0]['endpoints']);
+        $server = $services[0]['endpoints'][0];
+        $realId = $services[0]['localID'];
+        return true;
+    }
+
+    /**
+     * Looks for the XRDS document and then delegates discovery to _discoveryXrds()
+     *
+		 * @param string $userInput The OpenId which the user entered
+     * @param string &$realId OpenID identity URL
+     * @param string &$server OpenID server URL
+     * @param float &$version OpenID protocol version
+     * @return bool
+     */
+    protected function _discoveryYadis($userInput, &$realId, &$server, &$version) {
+        $status = null;
+        $resp = $this->_httpRequest($userInput, "GET", array(), $status, true); //We need HTTP header information as well
+        $n = strpos($resp, "\n\n");
+        $header = trim(substr($resp, 0, $n));
+        $body = trim(substr($resp, $n));
+        unset ($resp, $n, $rn);
+
+        $tempHeader = explode("\n", $header);
+        $header = array();
+        foreach ($tempHeader as $temp) {
+            $temp = explode(":", $temp, 2);
+            if (count($temp) > 1) {
+                $header[strtolower(trim($temp[0]))] = trim($temp[1]);
+            }
+        }
+        unset($tempHeader, $temp);
+        $xrds = null;
+        if (isset($header['x-xrds-location'])) { //Check if the HTTP header contains information on the XRDS location
+            $xrds = $this->_httpRequest($header['x-xrds-location'], "GET");
+        }elseif (isset($header['content-type']) && (strpos($header['content-type'], "application/xrds+xml") !== false)) { //Else check if this document might be an XRDS document
+            $xrds = $body;
+        }else{ //Last attempt; check if the HTML header holds the XRDS location
+            preg_match_all('/<meta[^>]*http-equiv=[\'"]X-XRDS-Location[\'"][^>]*content=[\'"]([^\'"]+)[\'"][^>]*\/?>/i', $body, $matches1);
+            preg_match_all('/<meta[^>]*content=\'"([^\'"]+)[\'"][^>]*http-equiv=[\'"]X-XRDS-Location[\'"][^>]*\/?>/i', $body, $matches2);
+            $locations = array_merge($matches1[1], $matches2[1]);
+            if (count($locations) > 0) {
+                $xrds = $this->_httpRequest($locations[0], "GET");
+            }
+        }
+        if (!is_null($xrds)) {
+            return $this->_discoveryXrds($xrds, $realId, $server, $version);
+        }else{
+            return false;
+        }
+    }
+
+    /**
      * Performs check of OpenID identity.
      *
      * This is the first step of OpenID authentication process.
@@ -827,6 +1001,9 @@ class Zend_OpenId_Consumer
             $this->_setError("Discovery failed: " . $this->getError());
             return false;
         }
+                if ($id == "http://specs.openid.net/auth/2.0/identifier_select") {
+                    $claimedId = $id;
+                }
         if (!$this->_associate($server, $version)) {
             $this->_setError("Association failed: " . $this->getError());
             return false;

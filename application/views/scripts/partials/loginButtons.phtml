@@ -1,13 +1,15 @@
 <div id="loginButtons">
 	<?php $config = Zend_Registry::get('config'); ?>
 	<!--<div class="fb-login-button" data-size="medium" data-scope="email" data-width="200" data-max-rows="1" data-auth-type="fb">Connect with Facebook</div>-->
-	<button class="btn fb-button login-btn" data-auth-type="fb" <?php echo $config->facebook->method . '=' . $config->facebook->endpoint; ?>><i class="icon-fb"></i>Facebook(ajax)</button>
-	<button class="btn fb-button login-btn" data-auth-type="fb-oauth" data-popup="<?php echo Josh_Facebook::getLoginUrl(array('redirect_uri' => $config->facebook->redirect, 'scope' => 'email')); ?>"><i class="icon-fb"></i>Facebook(oauth)</button>
-	<button class="btn btn-info login-btn" data-auth-type="twitter" <?php echo $config->twitter->method . '=' . $config->twitter->endpoint; ?>><i class="icon-twitter"></i>Twitter(oauth)</button>
-	<button class="btn login-btn" data-auth-type="none" data-ajax="/demos/zf-ajax/ajax">No Type (will error)</button>
-	<form class="form-inline" id="userpass">
+	<ul>
+	<li><button class="btn fb-button login-btn" data-auth-type="fb" <?php echo $config->facebook->method . '=' . $config->facebook->endpoint; ?>><i class="icon-fb"></i>Facebook(ajax)</button></li>
+	<li><button class="btn fb-button login-btn" data-auth-type="fb-oauth" data-popup="<?php echo Josh_Facebook::getLoginUrl(array('redirect_uri' => $config->facebook->redirect, 'scope' => 'email')); ?>"><i class="icon-fb"></i>Facebook(oauth)</button></li>
+	<li><button class="btn btn-info login-btn" data-auth-type="twitter" <?php echo $config->twitter->method . '=' . $config->twitter->endpoint; ?>><i class="icon-twitter"></i>Twitter(oauth)</button></li>
+	<li><button class="btn login-btn btn-success" data-auth-type="google" <?php echo $config->google->method . '=' . $config->google->endpoint; ?>>Google</button></li>
+	<li><button class="btn login-btn" data-auth-type="none" data-ajax="/demos/zf-ajax/ajax">No Type (will error)</button></li>
+	<li><form class="form-inline" id="userpass">
 		<input type="text" class="input-small" name="email" placeholder="Email">
 		<input type="password" class="input-small" name="password" placeholder="Password">
 		<button type="submit" class="btn login-btn" name="submit" data-auth-type="userpass" <?php echo $config->userpass->method . '=' . $config->userpass->endpoint; ?>>Go</button>
-	</form>
+	</form></li>
 </div>

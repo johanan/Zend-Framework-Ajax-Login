@@ -10,6 +10,8 @@ class Josh_Auth_Adapter_Factory
 			return new Josh_Auth_Adapter_Twitter();
 		elseif($type == 'userpass')
 			return new Josh_Auth_Adapter_Db($options['email']);
+		elseif($type == 'google')
+			return new Josh_Auth_Adapter_Google();
 		else 
 			return new Josh_Auth_Adapter_None();
 	}
