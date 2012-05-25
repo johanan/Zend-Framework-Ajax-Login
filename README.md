@@ -22,17 +22,17 @@ To setup each button you need to add configurations in your application.ini (I h
 There are routes in the application that map the type and the method based on what you put here. These methods and types are pulled in javascript and the appropriate action is taken. 
 
 * data-ajax makes an ajax call with optional form inputs
-* data-endpoint redirects the page to (most likely) and oauth endpoint
+* data-endpoint redirects the page to (most likely) an oauth endpoint
 * data-popup creates a javascript popup which will go to the endpoint and reload the main page when done
 
 The auth type is needed to find a form(if needed) and technically to create the auth adapter, but that is pulled from the URL and not this attribute.
 
-One thing to remember - if you use a popup you have to set the method at the end of the endpoint (for example /oauth/google/popup). If you do not do this the application will reload the page in the popup instead of the main page. The use is still authenticated as the session is set, but you will not get the user experience you are expecting.
+One thing to remember - if you use a popup you have to set the method at the end of the endpoint (for example /oauth/google/popup). If you do not do this the application will reload the page in the popup instead of the main page. The user is still authenticated as the session is set, but you will not get the user experience you are expecting.
 
 ## Auth Adapter Setup
 You can easily extend this to use any type of service or method you can think of as it utilizes Zend Framework’s Auth Adapter. 
 
-First create and adapter and then modify Josh_Auth_Adapter_Factory to add the new auth adapter. You have access to the type sent and the parameters sent (either GET or POST as it sends the full ZF params). Finally just send a Zend_Auth_Result::SUCCESS or a Zend_Auth_Result::FAILURE and the controller will take care of sending the JSON or redirecting the page. 
+First create an adapter and then modify Josh_Auth_Adapter_Factory to add the new auth adapter. You have access to the type sent and the parameters sent (either GET or POST as it sends the full ZF params). Finally just send a Zend_Auth_Result::SUCCESS or a Zend_Auth_Result::FAILURE and the controller will take care of sending the JSON or redirecting the page. 
 
 What you have to do. Right now the success result just creates an array and sends it back to be put in a user object. You will most likely want to create something that checks for the existence of the user in a database and create your user from there.
 
