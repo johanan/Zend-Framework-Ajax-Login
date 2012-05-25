@@ -17,7 +17,7 @@ class Josh_Auth_Adapter_Twitter implements Zend_Auth_Adapter_Interface
 		$options = Zend_Registry::get('config')->twitter;
 		
 		$this->_config = array(
-              'callbackUrl' => $options->redirectUrl,
+              'callbackUrl' => $options->endpoint,
                'siteUrl' => 'http://api.twitter.com/oauth',
                'consumerKey' => $options->consumerKey,
                'consumerSecret' => $options->consumerSecret
