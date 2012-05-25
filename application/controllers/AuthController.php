@@ -34,6 +34,11 @@ class AuthController extends Zend_Controller_Action
 	
 	public function oauthAction()
 	{
+		$oauthNS = new Zend_Session_Namespace('oauthNS');
+		if($this->getRequest()->getParam('method') && $this->getRequest()->getParam('method') == 'popup')
+		{
+			$oauthNS->popup = true;
+		}
 		$result = $this->_auth->authenticate($this->_adapter);
 		if($result->isValid())
 		{
@@ -43,7 +48,14 @@ class AuthController extends Zend_Controller_Action
 			$errorMessage = $result->getMessages();
 			$this->_helper->flashMessenger->addMessage(array('error'=>$errorMessage['error']));
 		}
-		$this->_redirect('/');
+		
+		if(isset($oauthNS->popup) && $oauthNS->popup == true)
+		{
+			unset($oauthNS->popup);
+			echo $this->view->partial('partials/oauthClose.phtml');
+		}else{
+			$this->_redirect('/');
+		}
 	}
 	
 	public function ajaxAction()

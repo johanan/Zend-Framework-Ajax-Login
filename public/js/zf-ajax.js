@@ -112,19 +112,21 @@ zfAjax.loginEvents = function(ev){
     		//use it's js SDK to login
     		FB.getLoginStatus(function(response){
     			if(response.status === 'connected'){
-    				zfAjax.checkLogin(authType, target.attr('data-endpoint'));
+    				zfAjax.checkLogin(authType, target.attr('data-ajax'));
     			}else{
     				FB.login(function(response){
-			    		zfAjax.checkLogin(authType, target.attr('data-endpoint'));
+			    		zfAjax.checkLogin(authType, target.attr('data-ajax'));
     				}, {scope: 'email'});
     			}
     		});
-    	}else if(target.attr('data-endpoint') && target.attr('data-ajax') == 'true'){
+    	}else if(target.attr('data-ajax')){
     		//these attributes tell us to do this through ajax
-    		zfAjax.checkLogin(authType, target.attr('data-endpoint'));
+    		zfAjax.checkLogin(authType, target.attr('data-ajax'));
     	}else if(typeof target.attr('data-endpoint') !== 'undefined' && target.attr('data-endpoint') !== false){
     		//this attribute tells us to redirect
     		window.location = target.attr('data-endpoint');
+    	}else if(target.attr('data-popup')){
+    		window.open(target.attr('data-popup'), "Oauth Popup", "width=400,height=400");
     	}else{
     		//let's just try and see if there is a way to login
     		zfAjax.checkLogin(authType, target.attr('data-endpoint'));

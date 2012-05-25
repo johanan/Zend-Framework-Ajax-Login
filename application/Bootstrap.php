@@ -17,20 +17,22 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$router = $front->getRouter();
 		 
 		$oauth = new Zend_Controller_Router_Route(
-		    'oauth/:type',
+		    'oauth/:type/:method',
 		    array(
 		        'controller' => 'auth',
 		        'action'     => 'oauth',
-		        'type'		=> 'none'
+		        'type'		=> 'none',
+		        'method'	=> 'redirect'
 		    )
 		);
 		
 		$ajax = new Zend_Controller_Router_Route(
-		    'ajax/:type',
+		    'ajax/:type/:method',
 		    array(
 		        'controller' => 'auth',
 		        'action'     => 'ajax',
-		        'type'		=> 'none'
+		        'type'		=> 'none',
+		        'method'	=> 'redirect'
 		    )
 		);
 		 
