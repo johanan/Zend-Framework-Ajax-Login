@@ -22,12 +22,12 @@ class AuthController extends Zend_Controller_Action
 		}
 	}
 	
-	protected function jsonResponse($status, $code, $html)
+	protected function jsonResponse($status, $code, $html, $message = null)
 	{
 		$this->getResponse()
 			->setHeader('Content-Type', 'application/json')
 			-> setHttpResponseCode($code)
-			->setBody(Zend_Json::encode(array("status"=>$status, "html"=>$html)))
+			->setBody(Zend_Json::encode(array("status"=>$status, "html"=>$html, "message"=>$message)))
 			->sendResponse();
 			exit;
 	}
@@ -65,7 +65,7 @@ class AuthController extends Zend_Controller_Action
 			$alert = $this->view->partial('partials/alert.phtml', array('alert'=>$errorMessage['error'], 'alertClass'=>'alert-error'));
 			
 			$html = array("alert"=>$alert);		
-			$this->jsonResponse('error', 401, $html);
+			$this->jsonResponse('error', 401, $html, $errorMessage['error']);
 		}
 	}
 }
