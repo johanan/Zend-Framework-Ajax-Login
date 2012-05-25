@@ -16,14 +16,18 @@ autoloadernamespaces.Josh = "Josh_"
 
 facebook.appid = APP_ID
 facebook.secret = APP_SECRET
-facebook.redirectUrl = "http://YOUR_SERVER/oauth/fb"
+facebook.redirect = "http://YOUR_SERVER/oauth/fb"
+
 facebook.endpoint = "/ajax/fb"
+facebook.method = "data-ajax"
 
 twitter.consumerKey = APP_ID
 twitter.consumerSecret = APP_SECRET
-twitter.redirectUrl = "http://YOUR_SERVER/oauth/twitter"
+twitter.redirectUrl = "http://YOUR_SERVER/oauth/twitter/popup"
+twitter.method = "data-popup"
 
 userpass.endpoint = "/ajax/userpass"
+userpass.method = "data-ajax"
 
 [staging : production]
 
