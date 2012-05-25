@@ -7,7 +7,7 @@ FB.init({
 });
 
 window.jQuery(document).ready(function() {
-	$('.login-btn').click(function(ev){
+	window.jQuery('.login-btn').click(function(ev){
 		zfAjax.loginEvents(ev);
 	});
 });
