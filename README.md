@@ -21,9 +21,9 @@ To setup each button you need to add configurations in your application.ini (I h
 
 There are routes in the application that map the type and the method based on what you put here. These methods and types are pulled in javascript and the appropriate action is taken. 
 
-data-ajax makes an ajax call with optional form inputs
-data-endpoint redirects the page to (most likely) and oauth endpoint
-data-popup creates a javascript popup which will go to the endpoint and reload the main page when done
+* data-ajax makes an ajax call with optional form inputs
+* data-endpoint redirects the page to (most likely) and oauth endpoint
+* data-popup creates a javascript popup which will go to the endpoint and reload the main page when done
 
 The auth type is needed to find a form(if needed) and technically to create the auth adapter, but that is pulled from the URL and not this attribute.
 
