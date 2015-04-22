@@ -58,4 +58,4 @@ The AuthController is very simple. It has two actions oauthAction or ajaxAction 
 This is a great spot to grab the responses and setup your own users. It currently only stores user info in the session. You will want to add the hooks to however you initialize and create users here.
 
 ## Demo
-You can test things out at http://ejosh.co/demos/zf-ajax/
+You can test things out at https://zfajax.herokuapp.com/
